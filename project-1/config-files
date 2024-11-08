@@ -19,3 +19,7 @@ else
     git clone https://gitlab.com/cit2420/2420-as2-starting-files.git
     echo "Successfully cloned the repository"
 fi
+
+# references: 
+https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Compilers-and-Options
+https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
