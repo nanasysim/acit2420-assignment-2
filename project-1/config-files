@@ -1,7 +1,9 @@
 #!/bin/bash
-# this script will clone the repository
+# this script will clone the starting files repository
+
+# to check if user is running on sudo
 if [[ $EUID -ne 0 ]]; then
-    echo "$0 is not running as root. Use sudo."
+    echo "$0 is not running as root. Please use sudo."
     exit 2
 fi
 
