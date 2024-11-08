@@ -5,13 +5,9 @@ if [[ $EUID -ne 0 ]]; then
     exit 2
 fi
 
-# check if git is executable
+# check if git exisits and is executable
 if ! [[ -x "$(command -v git)" ]]; then
-    echo "Error: git is not executable." >&2
-    exit 1
-# check if git is installed
-elif ! [[ -e "$(command -e git)" ]]; then
-    echo "Error: git is not installed." >&2
+    echo "Error: git does not exist." >&2
     exit 1
 # check if the repository already exists
 elif [[ -d "2420-as2-starting-files" ]]; then
