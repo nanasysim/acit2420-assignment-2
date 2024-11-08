@@ -1,0 +1,4 @@
+# list of packages to install
+# make this editable by user
+kakoune
+tmux
