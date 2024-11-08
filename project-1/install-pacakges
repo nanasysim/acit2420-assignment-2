@@ -1,0 +1,8 @@
+#!/bin/bash
+# this script will install pacakges from a file
+
+# check if user is running the script with sudo
+if [[ $EUID -ne 0 ]]; then
+    echo "$0 is not running as root. Please use sudo."
+    exit 2
+fi
