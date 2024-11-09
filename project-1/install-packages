@@ -2,22 +2,26 @@
 # This script will install pacakges from a file
 
 # Check if user is running the script with sudo
-if [[ $EUID -ne 0 ]]; then
+if [[ ! $EUID == 0 ]]; then # [4] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.
     echo "$0 is not running as root. Please use sudo."
     exit 2
 fi
 
-# Update the package database
+# Set the user home directory
+USER_HOME="/home/$SUDO_USER" 
+HOME=$USER_HOME
+
+# Update the package database to the latest version
 echo "Updating package database..."
-if ! pacman -Sy; then
-    echo "Error: Failed to update package database" >&2
+if ! pacman -Syu; then # [4] 
+    echo "Error: Failed to update package database" >&2 # [5] >&2 is used to redirect the output to stderr
     exit 1
 fi
 
 # Check if packages file exists
-current_directory=$(pwd)
-if ! [[ -f "$current_directory/packages" ]]; then
-    echo "Error: packages file does not exist." >&2
+home_directory="$HOME"
+if ! [[ -f "$home_directory/packages" ]]; then 
+    echo "Error: packages file does not exist." >&2 # [5]
     exit 1
 fi
 
@@ -29,19 +33,19 @@ fi
     # e. If the package is installed successfully, print "Installed $package"
     # f. If the package fails to install, print "Error: Failed to install $package" and exit with status 1
     # g. If the package is already installed, print "$package is already installed.
-while IFS= read -r package; do
-    if ! pacman -Qi "$package" &> /dev/null; then
+while IFS= read -r package; do # [3] IFS is used to set the Internal Field Separator to newline. read -r is used to read the input line by line.
+    if ! pacman -Qi "$package" &> /dev/null; then # [4] -Qi is used to query information about a package. &> /dev/null is used to redirect the output to /dev/null.
         echo "Installing $package..."
-        if pacman -S --noconfirm "$package"; then
+        if pacman -S --noconfirm "$package"; then # [4] --noconfirm is used to install the package without asking for confirmation. This skips the step of asking the user to confirm the installation by typing "y".
             echo "Installed $package"
         else
-            echo "Error: Failed to install $package" >&2
+            echo "Error: Failed to install $package" >&2 # [5]
             exit 1
         fi
     else
         echo "$package is already installed."
     fi
-done < "$current_directory/packages"
+done < "$home_directory/packages"
 
 # Print success message
 echo "Successfully installed all packages"
@@ -50,8 +54,8 @@ echo "Successfully installed all packages"
 exit 0
 
 # Referenences:
-# [1] https://gitlab.com/cit2420/2420-notes-f24/-/blob/main/2420-notes/week-seven.md?ref_type=heads
-# [2] https://linuxize.com/post/bash-check-if-file-exists/
-# [3] https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/
-# [4] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
-# [5] https://wiki.archlinux.org/title/Pacman
+# [1] https://linuxize.com/post/bash-check-if-file-exists/
+# [2] https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/
+# [3] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
+# [4] https://wiki.archlinux.org/title/Pacman
+# [5] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error

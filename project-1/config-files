@@ -7,6 +7,10 @@ if [[ ! $EUID == 0 ]]; then # [4] EUID is the effective user ID of the current u
     exit 2
 fi
 
+# Set the user home directory
+USER_HOME="/home/$SUDO_USER" 
+HOME=$USER_HOME
+
 # Define the repository URL and the target directory
 repository_url="https://gitlab.com/cit2420/2420-as2-starting-files.git"
 target_directory="$HOME/2420-as2-starting-files"
