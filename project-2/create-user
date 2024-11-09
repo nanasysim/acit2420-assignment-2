@@ -1,1 +1,17 @@
 #!/bin/bash
+# This script will create a new user with the specified username and password
+
+# Specified shell
+# A home directory created for new user
+# contents of the /etc/skel directory copied into the new user's home directory
+# additional groups that they could be added to (the new user should have a primary group that matches their username)
+# new user should have a password created using the passwd utility 
+
+# Check if the script is running as root
+if [[ ! $EUID == 0 ]]; then # [1] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.
+    echo "$0 is not running as root. Please use sudo."
+    exit 2
+fi
+
+# References:
+# [1] 

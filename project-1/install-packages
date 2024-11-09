@@ -2,7 +2,7 @@
 # This script will install pacakges from a file
 
 # Check if user is running the script with sudo
-if [[ ! $EUID == 0 ]]; then # [4] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.
+if [[ ! $EUID == 0 ]]; then # [6] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.
     echo "$0 is not running as root. Please use sudo."
     exit 2
 fi
@@ -66,3 +66,4 @@ exit 0
 # [3] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
 # [4] https://wiki.archlinux.org/title/Pacman
 # [5] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
+# [6] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Variables
