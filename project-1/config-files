@@ -27,9 +27,9 @@ fi
 
 # Make symbolic links to the configuration files
 # Define the target directories
-target_bin = "$HOME/bin"
-target_config = "$HOME/.config"
-target_bashrc = "$HOME/.bashrc"
+target_bin="$HOME/bin"
+target_config="$HOME/.config"
+target_bashrc="$HOME/.bashrc"
 
 # Create symbolic links
 ln -sf "$target_directory/bin" "$target_bin" 
