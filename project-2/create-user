@@ -14,4 +14,4 @@ if [[ ! $EUID == 0 ]]; then # [1] EUID is the effective user ID of the current u
 fi
 
 # References:
-# [1] 
+# [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Variables

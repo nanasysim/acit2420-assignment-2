@@ -68,6 +68,6 @@ echo "Successfully completed system setup"
 # Exit with status 0
 exit 0 
 # References:
-# [1] https://wiki.archlinux.org/title/Pacman
+# [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Variables
 # [2] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
 # [3] https://code2care.org/howto/add-newline-character-bash-script-string/#:~:text=You%20can%20make%20use%20of%20the%20n%20character,it%20platform%20independent.%20echo%20-e%20%22nHello%21nHow%20are%20you%3F%22
