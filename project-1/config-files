@@ -1,26 +1,26 @@
 #!/bin/bash
-# this script will clone the starting files repository
+# This script will clone the starting files repository
 
-# to check if user is running on sudo
+# To check if user is running on sudo
 if [[ $EUID -ne 0 ]]; then
     echo "$0 is not running as root. Please use sudo."
     exit 2
 fi
 
-# check if git exisits and is executable
+# Check if git exisits and is executable
 if ! [[ -x "$(command -v git)" ]]; then
     echo "Error: git does not exist." >&2
     exit 1
-# check if the repository already exists
+# Check if the repository already exists
 elif [[ -d "2420-as2-starting-files" ]]; then
     echo "The repository already exists" >&2
-# clone the repository
+# Clone the repository
 else
     git clone https://gitlab.com/cit2420/2420-as2-starting-files.git
     echo "Successfully cloned the repository"
 fi
 
-# references: 
-https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Compilers-and-Options
-https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
-https://linuxize.com/post/bash-check-if-file-exists/
+# References: 
+# https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Compilers-and-Options
+# https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
+# https://linuxize.com/post/bash-check-if-file-exists/
