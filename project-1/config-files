@@ -2,25 +2,49 @@
 # This script will clone the starting files repository
 
 # To check if user is running on sudo
-if [[ $EUID -ne 0 ]]; then
+if [[ ! $EUID == 0 ]]; then # [4] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.
     echo "$0 is not running as root. Please use sudo."
     exit 2
 fi
 
+# Define the repository URL and the target directory
+repository_url="https://gitlab.com/cit2420/2420-as2-starting-files.git"
+target_directory="$HOME/2420-as2-starting-files"
+
+# Clone the repository 
 # Check if git exisits and is executable
-if ! [[ -x "$(command -v git)" ]]; then
-    echo "Error: git does not exist." >&2
+if [[ !  -x "$(command -v git)" ]]; then # [1] command -v git is used to check if git exists and is executable. If git does not exist, the script will print an error message and exit with status 1.
+    echo "Error: git does not exist." >&2 # [2] >&2 is used to redirect the output to stderr
     exit 1
 # Check if the repository already exists
-elif [[ -d "2420-as2-starting-files" ]]; then
-    echo "The repository already exists" >&2
+elif [[ -d "2420-as2-starting-files" ]]; then # [3] -d is used to check if the directory exists. If the directory already exists, the script will print an error message and exit with status 1.
+    echo "The repository already exists" >&2 # [2] 
 # Clone the repository
 else
-    git clone https://gitlab.com/cit2420/2420-as2-starting-files.git
+    git clone "$repository_url" "$target_directory" # Clones the repository from the specified URL to the target directory
     echo "Successfully cloned the repository"
 fi
 
+# Make symbolic links to the configuration files
+# Define the target directories
+target_bin = "$HOME/bin"
+target_config = "$HOME/.config"
+target_bashrc = "$HOME/.bashrc"
+
+# Create symbolic links
+ln -sf "$target_directory/bin" "$target_bin" 
+ln -sf "$target_directory/config" "$target_config"
+ln -sf "$target_directory/home/bashrc" "$target_bashrc"
+
+# Check if the symbolic links are created successfully
+if [[ -L "$target_bin" && -L "$target_config" && -L "$target_bashrc" ]]; then # [3] -L is used to check if the file is a symbolic link. If all symbolic links are created successfully, the script will print a success message.
+    echo "Successfully created symbolic links"
+else
+    echo "Error: Failed to create symbolic links" >&2 # [2]
+    exit 1
+fi
 # References: 
-# [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Compilers-and-Options
+# [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Builtins
 # [2] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
 # [3] https://linuxize.com/post/bash-check-if-file-exists/
+# [4] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Variables
