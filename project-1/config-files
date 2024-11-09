@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script will clone the starting files repository
+# This script will clone the starting files repository and create symbolic links to the configuration files
 
 # To check if user is running on sudo
 if [[ ! $EUID == 0 ]]; then # [4] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.

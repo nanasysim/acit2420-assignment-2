@@ -1,0 +1,20 @@
+#!/bin/bash
+# This script will set up the project environment
+
+# to ensure that user is running the script with sudo
+if [ $EUID -ne 0 ]; then
+    echo "$0 is not running as root. Use sudo."
+    exit 2
+fi
+# Make a getopts to make user choose which option to install first
+
+# Run 
+
+# Run the package installation script
+./install-packages.sh
+
+# Run the symbolic link creation script
+./create-symbolic-link.sh
+
+
+echo "Successfully completed system setup"
