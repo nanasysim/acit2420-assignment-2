@@ -1,12 +1,6 @@
 #!/bin/bash
 # This script will create a new user with the specified shell, a home directory, contents of the /etc/skel directory copied into the new user's home directory, additional groups that they could be added to, and a password created using the passwd utility
 
-# Specified shell
-# A home directory created for new user
-# contents of the /etc/skel directory copied into the new user's home directory
-# additional groups that they could be added to (the new user should have a primary group that matches their username)
-# new user should have a password created using the passwd utility 
-
 # Check if the script is running as root
 if [[ ! $EUID == 0 ]]; then # [1] EUID is the effective user ID of the current user running the script. If the EUID is not equal to 0, it means that the script is not running as root.
     echo "$0 is not running as root. Please use sudo."
@@ -18,73 +12,79 @@ USER_HOME="/home/$SUDO_USER"
 HOME=$USER_HOME # Set the HOME environment variable to the user's home directory
 
 # Define default values for the user creation
+# Initialize variables
 DEFAULT_SHELL="/bin/bash"
 DEFAULT_HOME_DIR="/home"
-UID=""
-GID=""
+username=""
+shell="$DEFAULT_SHELL"
+groups=""
+home_dir=false
 
 # Usage function to display the usage of the script
 usage() {
-    usage_message="
-COMMAND STRUCTURE:\n
-    sudo ./create-user.sh [OPTIONS]\n\n
-
-OPTIONS:\n
-    -u    Username\n
-    -p    Password\n
-    -g    Additional groups (comma-separated)\n
-    -s    Shell (default: $DEFAULT_SHELL)\n
-    -h    Home directory (default: $DEFAULT_HOME_DIR/[username])\n
-    -H    Display this help message\n"
-    
-    echo -e "$usage_message"
+    echo "Usage: sudo $0 -u <username> [-s <shell>] [-g <groups>] [-m] [-h]"
+    echo "  -u    Username"
+    echo "  -s    Shell (default: $DEFAULT_SHELL)"
+    echo "  -g    Additional groups (comma-separated)"
+    echo "  -m    Create home directory"
+    echo "  -h    Display this help message"
     exit 1
 }
 
-
-# Function that creates a new user with user input
-# This function will get user's username as input
-# Then this function will ask to enter the shell for the user
-# Then this function will create a home directory for the user
-# Then this function will copy the contents of the /etc/skel directory into the new user's home directory
-# Then this function will add the user to primary groups
-new_user() {
-    read -p "Enter the username for the new user: " USERNAME
+# Function to check if usernames are valid
+name_check() {
+    if [[ $1 == *['!'@#\$%^\&*()+=/\ ]* || -z $1 ]]; then
+        echo 1
+    else
+        echo 0
+    fi
 }
 
-# Function that will add user to additional groups
-add_user_to_groups() {
-    read -p "Enter the additional groups for the new user (separated by commas): " GROUPS
-    IFS=',' read -r -a GROUPS_ARRAY <<< "$GROUPS" # [3] IFS is used to set the Internal Field Separator to comma. read -r -a is used to read the input as an array.
+# Function to get the next available UID or GID
+get_next_ID() {
+    while getopts ":gu" opts; do
+        case $opts in
+            g) 
+                file="/etc/group"; column=3 
+                ;;
+            u) 
+                file="/etc/passwd"; column=3 
+                ;;
+            ?) 
+                echo "Syntax: get_next_ID [-g|-u]"; 
+                exit 1 
+                ;;
+        esac
+    done
+    echo "$(($(grep -Ev ":[0-9]{1,3}:|:6553[3-4]:" $file | cut -d ":" -f $column | sort -gr | head -n 1)+1))"
 }
 
 # Get user input through getopts
-while getopts ":u:p:g:s:h:H" opt; do
+while getopts ":u:s:g:mh" opt; do
     case $opt in
-        u)
-            USERNAME=$OPTARG
+        u) 
+            username="$OPTARG" 
             ;;
-        p)
-            PASSWORD=$OPTARG
+        s) 
+            shell="$OPTARG" 
             ;;
-        g)
-            GROUPS=$OPTARG
+        g) 
+            groups="$OPTARG" 
             ;;
-        s)
-            SHELL=$OPTARG
+        m) 
+            home_dir=true 
             ;;
-        h)
-            HOME_DIR=$OPTARG
+        h) 
+            usage 
             ;;
-        H)
-            usage
-            ;;
-        ?)
-            echo "Invalid option: -$OPTARG" >&2
-            exit 1
+        ?) 
+            usage 
             ;;
     esac
 done
+
+# Shift to get username as positional argument
+shift $((OPTIND - 1)) # [5] shift is used to shift the positional parameters. OPTIND is the index of the next argument to be processed. By subtracting 1 from OPTIND, we get the index of the last processed argument.
 
 # Check if no options are provided
 if [ $OPTIND == 1 ]; then
@@ -93,9 +93,69 @@ if [ $OPTIND == 1 ]; then
 fi
 echo "Successfully created new user: $USERNAME"
 
+# Check if username is provided
+if [ -z "$username" ]; then # [6] -z is used to check if the variable is empty
+    usage
+fi
+
+# Check if username is valid
+if [[ ! $(name_check "$username") == 0 ]]; then
+    echo "Invalid username. Make sure there are no special characters in your username."
+    exit 1
+fi
+
+# Check if username already exists
+if grep -q "^$username:" /etc/passwd; then
+    echo "$username has been taken, please choos a differnt username."
+    exit 1
+fi
+
+# Get the next available UID and GID
+uid=$(get_next_ID -u)
+gid=$(get_next_ID -g)
+
+# Set default home directory if not provided
+homedir="$DEFAULT_HOME_DIR/$username" # Set the default home directory to /home/username
+
+# Add the new user to the /etc/passwd file with the specified username, UID, GID, home directory, and shell
+cat >> /etc/passwd <<- EOF
+$username:x:$uid:$gid::$homedir:$shell 
+EOF
+
+# Create the home directory and copy contents from /etc/skel if -m option is provided
+if [ "$home_dir" = true ]; then
+    mkdir -p "$homedir" # Create the home directory
+    cp -r /etc/skel/. "$homedir" # Copy the contents of /etc/skel to the new user's home directory
+    chown -R "$username:$username" "$homedir" # Change the ownership of the home directory to the new user
+    chmod 700 "$homedir" # Set the permissions of the home directory to 700 so that only the user has read, write, and execute permissions
+fi 
+
+# Add user to additional groups if specified
+if [ -n "$groups" ]; then # [6] -n is used to check if the variable is not empty
+    IFS=',' read -r -a groups_array <<< "$groups" # [3] IFS is used to set the Internal Field Separator to comma. read -a is used to read the input into an array.
+    for group in "${groups_array[@]}"; do # Loop through the groups_array
+        if ! grep -q "^$group:" /etc/group; then # Check if the group exists in /etc/group
+            groupadd "$group" # Add the group if it does not exist
+        fi
+        usermod -aG "$group" "$username" # Add the user to the group
+    done
+fi
+
+# Add user to primary group in /etc/group
+cat >> /etc/group <<- EOF
+$username:x:$gid:
+EOF
+
+# Set the password for the new user using the passwd utility
+echo "Set the password for $username:"
+passwd "$username"
+
+echo "User '$username' created successfully!"
 
 # References:
 # [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Variables
 # [2] https://code2care.org/howto/add-newline-character-bash-script-string/#:~:text=You%20can%20make%20use%20of%20the%20n%20character,it%20platform%20independent.%20echo%20-e%20%22nHello%21nHow%20are%20you%3F%22
 # [3] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
 # [4] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
+# [5] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bourne-Shell-Builtins
+# [6] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Conditional-Expressions
