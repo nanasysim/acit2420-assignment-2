@@ -1,12 +1,12 @@
 # Assignment 2: 
-This repository contains the bash scripts for the second assignment of the course `ACIT 2420`. The assignment consists of two projects, each of which is described in a separate section below.
+This repository contains the bash scripts for the second assignment of the course `ACIT 2420`. The assignment consists of two projects, each of which is described in a separate section below. The purpose of this assignment is to create bash scripts that automate the setup of a project environment and the creation of a new user.
 
 ## Table of contents
 1. [Project 1](#project-1)
 2. [Project 2](#project-2)
 
 ## Project 1
-Project once consists of three scripts:
+Project one consists of three scripts:
 1. `setup`
 2. `config-files`
 3. `install-packages`
