@@ -17,28 +17,30 @@ fi
 USER_HOME="/home/$SUDO_USER"
 HOME=$USER_HOME # Set the HOME environment variable to the user's home directory
 
-# Define variables
-USERNAME=""
-PASSWORD=""
-GROUPS=""
-SHELL="/bin/bash"
+# Define default values for the user creation
+DEFAULT_SHELL="/bin/bash"
+DEFAULT_HOME_DIR="/home"
 UID=""
 GID=""
 
 # Usage function to display the usage of the script
 usage() {
     usage_message="
-\n\nCOMMAND STRUCTURE:\n 
-    sudo ./create-user [OPTIONS] [USERNAME]\n\n
+COMMAND STRUCTURE:\n
+    sudo ./create-user.sh [OPTIONS]\n\n
 
 OPTIONS:\n
-    -h    Display the help message\n
-    -c    Create new user\n
-    -g    Add user to additional groups\n\n"
+    -u    Username\n
+    -p    Password\n
+    -g    Additional groups (comma-separated)\n
+    -s    Shell (default: $DEFAULT_SHELL)\n
+    -h    Home directory (default: $DEFAULT_HOME_DIR/[username])\n
+    -H    Display this help message\n"
     
-    echo -e $usage_message # [2] -e is used to enable interpretation of backslash escapes
-    exit 1 # Exit with status 1
+    echo -e "$usage_message"
+    exit 1
 }
+
 
 # Function that creates a new user with user input
 # This function will get user's username as input
@@ -57,19 +59,28 @@ add_user_to_groups() {
 }
 
 # Get user input through getopts
-while getopts "h:c:g:" opt; do
+while getopts ":u:p:g:s:h:H" opt; do
     case $opt in
-        h)
+        u)
             USERNAME=$OPTARG
             ;;
-        c)
+        p)
             PASSWORD=$OPTARG
             ;;
         g)
             GROUPS=$OPTARG
             ;;
+        s)
+            SHELL=$OPTARG
+            ;;
+        h)
+            HOME_DIR=$OPTARG
+            ;;
+        H)
+            usage
+            ;;
         ?)
-            echo "Invalid option: -$OPTARG" >&2 # [2] >&2 is used to redirect the output to stderr
+            echo "Invalid option: -$OPTARG" >&2
             exit 1
             ;;
     esac
