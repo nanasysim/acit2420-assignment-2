@@ -20,12 +20,19 @@ fi
 
 # Check if packages file exists
 home_directory="$HOME"
-if ! [[ -f "$home_directory/packages" ]]; then 
+packages_file="$home_directory/packages"
+if [[ ! -f "$home_directory/packages" ]]; then 
     echo "Error: packages file does not exist." >&2 # [5]
+# Create a default packages file
+    cat > "$packages_file" <<- EOL
+kakoune
+tmux
+EOL
+    echo "A default packages file has been created at $packages_file. Please add your own packages and run the script again."
     exit 1
 fi
 
-# 2. Install the packages from the file using the following steps:
+# Install the packages from the file using the following steps:
     # a. Read the packages file line by line
     # b. Check if the package is already installed
     # c. If the package is not installed, install the package
