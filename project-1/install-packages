@@ -50,8 +50,8 @@ echo "Successfully installed all packages"
 exit 0
 
 # Referenences:
-# https://gitlab.com/cit2420/2420-notes-f24/-/blob/main/2420-notes/week-seven.md?ref_type=heads
-# https://linuxize.com/post/bash-check-if-file-exists/
-# https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/
-# https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
-# https://wiki.archlinux.org/title/Pacman
+# [1] https://gitlab.com/cit2420/2420-notes-f24/-/blob/main/2420-notes/week-seven.md?ref_type=heads
+# [2] https://linuxize.com/post/bash-check-if-file-exists/
+# [3] https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/
+# [4] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
+# [5] https://wiki.archlinux.org/title/Pacman

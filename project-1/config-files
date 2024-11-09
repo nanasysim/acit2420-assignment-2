@@ -21,6 +21,6 @@ else
 fi
 
 # References: 
-# https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Compilers-and-Options
-# https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
-# https://linuxize.com/post/bash-check-if-file-exists/
+# [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Compilers-and-Options
+# [2] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
+# [3] https://linuxize.com/post/bash-check-if-file-exists/
