@@ -1,8 +1,57 @@
 #!/bin/bash
-# this script will install pacakges from a file
+# This script will install pacakges from a file
 
-# check if user is running the script with sudo
+# Check if user is running the script with sudo
 if [[ $EUID -ne 0 ]]; then
     echo "$0 is not running as root. Please use sudo."
     exit 2
 fi
+
+# Update the package database
+echo "Updating package database..."
+if ! pacman -Sy; then
+    echo "Error: Failed to update package database" >&2
+    exit 1
+fi
+
+# Check if packages file exists
+current_directory=$(pwd)
+if ! [[ -f "$current_directory/packages" ]]; then
+    echo "Error: packages file does not exist." >&2
+    exit 1
+fi
+
+# 2. Install the packages from the file using the following steps:
+    # a. Read the packages file line by line
+    # b. Check if the package is already installed
+    # c. If the package is not installed, install the package
+    # d. Print "Installing $package..."
+    # e. If the package is installed successfully, print "Installed $package"
+    # f. If the package fails to install, print "Error: Failed to install $package" and exit with status 1
+    # g. If the package is already installed, print "$package is already installed.
+while IFS= read -r package; do
+    if ! pacman -Qi "$package" &> /dev/null; then
+        echo "Installing $package..."
+        if pacman -S --noconfirm "$package"; then
+            echo "Installed $package"
+        else
+            echo "Error: Failed to install $package" >&2
+            exit 1
+        fi
+    else
+        echo "$package is already installed."
+    fi
+done < "$current_directory/packages"
+
+# Print success message
+echo "Successfully installed all packages"
+
+# Exit with status 0
+exit 0
+
+# Referenences:
+# https://gitlab.com/cit2420/2420-notes-f24/-/blob/main/2420-notes/week-seven.md?ref_type=heads
+# https://linuxize.com/post/bash-check-if-file-exists/
+# https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/
+# https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
+# https://wiki.archlinux.org/title/Pacman
