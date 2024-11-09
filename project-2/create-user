@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script will create a new user with the specified username and password
+# This script will create a new user with the specified shell, a home directory, contents of the /etc/skel directory copied into the new user's home directory, additional groups that they could be added to, and a password created using the passwd utility
 
 # Specified shell
 # A home directory created for new user
@@ -13,5 +13,78 @@ if [[ ! $EUID == 0 ]]; then # [1] EUID is the effective user ID of the current u
     exit 2
 fi
 
+# Set the user home directory
+USER_HOME="/home/$SUDO_USER"
+HOME=$USER_HOME # Set the HOME environment variable to the user's home directory
+
+# Define variables
+USERNAME=""
+PASSWORD=""
+GROUPS=""
+SHELL="/bin/bash"
+UID=""
+GID=""
+
+# Usage function to display the usage of the script
+usage() {
+    usage_message="
+\n\nCOMMAND STRUCTURE:\n 
+    sudo ./create-user [OPTIONS] [USERNAME]\n\n
+
+OPTIONS:\n
+    -h    Display the help message\n
+    -c    Create new user\n
+    -g    Add user to additional groups\n\n"
+    
+    echo -e $usage_message # [2] -e is used to enable interpretation of backslash escapes
+    exit 1 # Exit with status 1
+}
+
+# Function that creates a new user with user input
+# This function will get user's username as input
+# Then this function will ask to enter the shell for the user
+# Then this function will create a home directory for the user
+# Then this function will copy the contents of the /etc/skel directory into the new user's home directory
+# Then this function will add the user to primary groups
+new_user() {
+    read -p "Enter the username for the new user: " USERNAME
+}
+
+# Function that will add user to additional groups
+add_user_to_groups() {
+    read -p "Enter the additional groups for the new user (separated by commas): " GROUPS
+    IFS=',' read -r -a GROUPS_ARRAY <<< "$GROUPS" # [3] IFS is used to set the Internal Field Separator to comma. read -r -a is used to read the input as an array.
+}
+
+# Get user input through getopts
+while getopts "h:c:g:" opt; do
+    case $opt in
+        h)
+            USERNAME=$OPTARG
+            ;;
+        c)
+            PASSWORD=$OPTARG
+            ;;
+        g)
+            GROUPS=$OPTARG
+            ;;
+        ?)
+            echo "Invalid option: -$OPTARG" >&2 # [2] >&2 is used to redirect the output to stderr
+            exit 1
+            ;;
+    esac
+done
+
+# Check if no options are provided
+if [ $OPTIND == 1 ]; then
+    echo "No options provided. Please provide an option." >&2 # [4] >&2 is used to redirect the output to stderr
+    usage # Display the usage message
+fi
+echo "Successfully created new user: $USERNAME"
+
+
 # References:
 # [1] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Variables
+# [2] https://code2care.org/howto/add-newline-character-bash-script-string/#:~:text=You%20can%20make%20use%20of%20the%20n%20character,it%20platform%20independent.%20echo%20-e%20%22nHello%21nHow%20are%20you%3F%22
+# [3] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting
+# [4] https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Appending-Standard-Output-and-Standard-Error
